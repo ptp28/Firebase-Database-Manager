@@ -26,8 +26,9 @@ public class InitActivity extends AppCompatActivity {
     EditText urlInput;
     EditText apiInput;
     EditText idInput;
+    EditText branchInput;
 
-    private String data;
+    private String data="";
 
     private FirebaseOptions firebaseOptions;
     private FirebaseApp firebaseApp;
@@ -40,6 +41,7 @@ public class InitActivity extends AppCompatActivity {
         urlInput = (EditText) findViewById(R.id.editText1);
         apiInput = (EditText) findViewById(R.id.editText2);
         idInput = (EditText) findViewById(R.id.editText3);
+        branchInput = (EditText) findViewById(R.id.editText4);
 
         urlInput.setText("https://test-project-c04a3.firebaseio.com/");
         apiInput.setText("AIzaSyB2dSLaAmA9N-IFFq-M-zVSmH28c4yBirc");
@@ -65,7 +67,16 @@ public class InitActivity extends AppCompatActivity {
 
     private void initDatabase()
     {
-        DatabaseReference ref = FirebaseDatabase.getInstance(firebaseApp).getReference();
+        DatabaseReference ref;
+        if(branchInput.getText().toString().equals(""))
+        {
+            ref = FirebaseDatabase.getInstance(firebaseApp).getReference();
+        }
+        else
+        {
+            ref = FirebaseDatabase.getInstance(firebaseApp).getReference(branchInput.getText().toString());
+        }
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -80,7 +91,19 @@ public class InitActivity extends AppCompatActivity {
                 while(iterator.hasNext())
                 {
                     Map.Entry entry = (Map.Entry)iterator.next();
-                    data = data + entry.getKey().toString()+" : "+entry.getValue().toString()+"\n";
+                    if(entry.getValue() instanceof String ) {
+                        data = data + entry.getKey().toString()+" : "+entry.getValue().toString()+"\n";
+                    }
+                    else
+                    {
+                        data = data + entry.getKey().toString()+" - "+"\n";
+                        String dataSplit[] = entry.getValue().toString().split(",");
+                        for(int i=0;i<dataSplit.length;i++)
+                        {
+                            data = data + "\t"+dataSplit[i]+","+"\n";
+                        }
+                        data = data + "\n\n";
+                    }
                     System.out.println(data);
                 }
             }
