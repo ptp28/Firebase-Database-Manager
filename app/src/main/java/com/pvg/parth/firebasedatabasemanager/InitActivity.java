@@ -28,8 +28,6 @@ public class InitActivity extends AppCompatActivity {
     EditText idInput;
     EditText branchInput;
 
-    private String data="";
-
     private FirebaseOptions firebaseOptions;
     private FirebaseApp firebaseApp;
 
@@ -65,74 +63,20 @@ public class InitActivity extends AppCompatActivity {
         initDatabase();
     }
 
-    private void initDatabase()
-    {
+    private void initDatabase() {
         DatabaseReference ref;
-        if(branchInput.getText().toString().equals(""))
-        {
+        if (branchInput.getText().toString().equals("")) {
             ref = FirebaseDatabase.getInstance(firebaseApp).getReference();
-        }
-        else
-        {
+        } else {
             ref = FirebaseDatabase.getInstance(firebaseApp).getReference(branchInput.getText().toString());
         }
 
-
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                long numChildren = dataSnapshot.getChildrenCount();
-                Toast.makeText(getApplicationContext(), Long.toString(numChildren),Toast.LENGTH_LONG).show();
-
-
-                Map<String, Object> map = (Map<String, Object>)dataSnapshot.getValue();
-                Set set=map.entrySet();
-                Iterator iterator=set.iterator();
-                while(iterator.hasNext())
-                {
-                    Map.Entry entry = (Map.Entry)iterator.next();
-                    if(entry.getValue() instanceof String ) {
-                        data = data + entry.getKey().toString()+" : "+entry.getValue().toString()+"\n";
-                    }
-                    else
-                    {
-                        data = data + entry.getKey().toString()+" - "+"\n";
-                        String dataSplit[] = entry.getValue().toString().split(",");
-                        for(int i=0;i<dataSplit.length;i++)
-                        {
-                            data = data + "\t"+dataSplit[i]+","+"\n";
-                        }
-                        data = data + "\n\n";
-                    }
-                    System.out.println(data);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Toast.makeText(getApplicationContext(),"RETRIVAL OF DATA COMPLETE",Toast.LENGTH_SHORT).show();
-                showData();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        showData();
     }
 
     private void showData()
     {
         Intent intent = new Intent(this, ListData.class);
-        intent.putExtra("Data",data);
-        finish();
         startActivity(intent);
     }
 }
